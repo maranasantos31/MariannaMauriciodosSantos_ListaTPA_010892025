@@ -1,0 +1,158 @@
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        char gm, pc, vencedor;
+        string continuar, nm;
+        int ptJo, ptPC, empates, acabou, escolha, l, c, li, co, venceu;
+
+        ptJo = 0;
+        ptPC = 0;
+        empates = 0;
+        continuar = "s";
+        Random sorteio = new Random();
+
+        Console.WriteLine("Jogo da Velha");
+        Console.Write("Digite seu nome: ");
+        nm = Console.ReadLine();
+
+        Console.WriteLine("Escolha sua pe�a:");
+        Console.WriteLine("1 - X");
+        Console.WriteLine("2 - O");
+        escolha = int.Parse(Console.ReadLine());
+
+        if (escolha == 1)
+        {
+            gm = 'X';
+            pc = 'O';
+        }
+        else if (escolha == 2)
+        {
+            gm = 'O';
+            pc = 'X';
+        }
+        else
+        {
+            Console.WriteLine("Op��o errada, voc� vai ser X.");
+            gm = 'X';
+            pc = 'O';
+        }
+
+        while (continuar == "s")
+        {
+            char[,] jogo = new char[3, 3];
+            for (int i = 0; i < 3; i++)
+                for (int j = 0; j < 3; j++)
+                    jogo[i, j] = ' ';
+
+            acabou = 0;
+            vencedor = ' ';
+
+            while (acabou == 0)
+            {
+                Console.Clear();
+                Console.WriteLine("   0   1   2");
+                for (int i = 0; i < 3; i++)
+                {
+                    Console.Write(i + " ");
+                    for (int j = 0; j < 3; j++)
+                    {
+                        Console.Write(" " + jogo[i, j] + " ");
+                        if (j < 2) Console.Write("|");
+                    }
+                    Console.WriteLine();
+                    if (i < 2) Console.WriteLine("  ---+---+---");
+                }
+
+                Console.Write($"\n{nm}, digite linha e coluna (ex: 1 2): ");
+                string[] pos = Console.ReadLine().Split(' ');
+                l = int.Parse(pos[0]);
+                c = int.Parse(pos[1]);
+
+                if (jogo[l, c] == ' ')
+                {
+                    jogo[l, c] = gm;
+                }
+                else
+                {
+                    Console.WriteLine("Esse lugar j� est� sendo ocupado, click no ENTER para continuar...");
+                    Console.ReadLine();
+                    continue;
+                }
+
+                venceu = 0;
+                for (int i = 0; i < 3; i++)
+                {
+                    if (jogo[i, 0] == gm && jogo[i, 1] == gm && jogo[i, 2] == gm) venceu = 1;
+                    if (jogo[0, i] == gm && jogo[1, i] == gm && jogo[2, i] == gm) venceu = 1;
+                }
+                if (jogo[0, 0] == gm && jogo[1, 1] == gm && jogo[2, 2] == gm) venceu = 1;
+                if (jogo[0, 2] == gm && jogo[1, 1] == gm && jogo[2, 0] == gm) venceu = 1;
+
+                if (venceu == 1)
+                {
+                    vencedor = gm;
+                    ptJo++;
+                    acabou = 1;
+                }
+
+                if (acabou == 0)
+                {
+                    do
+                    {
+                        li = sorteio.Next(0, 3);
+                        co = sorteio.Next(0, 3);
+                    } while (jogo[li, co] != ' ');
+
+                    jogo[li, co] = pc;
+
+                    venceu = 0;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        if (jogo[i, 0] == pc && jogo[i, 1] == pc && jogo[i, 2] == pc) venceu = 1;
+                        if (jogo[0, i] == pc && jogo[1, i] == pc && jogo[2, i] == pc) venceu = 1;
+                    }
+                    if (jogo[0, 0] == pc && jogo[1, 1] == pc && jogo[2, 2] == pc) venceu = 1;
+                    if (jogo[0, 2] == pc && jogo[1, 1] == pc && jogo[2, 0] == pc) venceu = 1;
+
+                    if (venceu == 1)
+                    {
+                        vencedor = pc;
+                        ptPC++;
+                        acabou = 1;
+                    }
+                }
+
+                if (acabou == 0)
+                {
+                    int cheio = 1;
+                    for (int i = 0; i < 3; i++)
+                        for (int j = 0; j < 3; j++)
+                            if (jogo[i, j] == ' ')
+                                cheio = 0;
+
+                    if (cheio == 1)
+                    {
+                        empates++;
+                        acabou = 1;
+                    }
+                }
+            }
+
+            Console.Clear();
+            if (vencedor == gm) Console.WriteLine($"{nm} ganhou!");
+            else if (vencedor == pc) Console.WriteLine("Computador ganhou!");
+            else Console.WriteLine("Empate!");
+
+            Console.WriteLine("\n=== Placar ===");
+            Console.WriteLine($"{nm}: {ptJo} vit�rias");
+            Console.WriteLine($"Computador: {ptPC} vit�rias");
+            Console.WriteLine($"Empates: {empates}");
+
+            Console.Write("\nQuer jogar de novo? (s/n): ");
+            continuar = Console.ReadLine().ToLower();
+        }
+    }
+}
